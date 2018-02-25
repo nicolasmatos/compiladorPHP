@@ -1,0 +1,60 @@
+body{
+    background-color: #333333;
+}
+.container{
+    margin-top: 50px;
+    border: 1px solid #999999;
+    padding: 0;
+    min-height: 505px;
+    padding-left: 5px;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0;
+    font-size: 1rem;
+    line-height: 0;
+    color: #ffffff;
+    background-color: transparent;
+    background-clip: padding-box;
+    border: 0;
+    border-radius: 0;
+    height: 24px;
+}
+
+.form-control:focus {
+    display: block;
+    width: 100%;
+    padding: 0;
+    font-size: 1rem;
+    line-height: 0;
+    color: #ffffff;
+    background-color: #444444;
+    background-clip: padding-box;
+    border-radius: 0;
+    border-color: transparent;
+    box-shadow: none;
+    height: 24px;
+}
+
+.form-group {
+    margin-bottom: 0;
+}
+
+.numbers{
+    float: left;
+    border-right: 1px solid #999999;
+    width: 23px;
+    min-height: 500px;
+}
+
+.numbers > p{
+    margin-bottom: 0;
+    color: #999999;
+}
+
+.form-group{
+    float: right;
+    width: 97.97%;
+}
