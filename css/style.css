@@ -58,3 +58,56 @@ body{
     float: right;
     width: 97.97%;
 }
+
+@media all and (max-width: 1200px){
+    .form-group {
+        width: 97.5%;
+    }
+}
+
+@media all and (max-width: 990px){
+    .form-group {
+        width: 96.7%;
+    }
+}
+
+@media all and (max-width: 767px){
+    .form-group {
+        width: 95.6%;
+    }
+}
+
+@media all and (max-width: 575px){
+    .container{
+        width: 95%;
+    }
+}
+
+@media all and (max-width: 557px){
+    .form-group {
+        width: 95.4%;
+    }
+}
+
+@media all and (max-width: 533px){
+    .form-group {
+        width: 95.29%;
+    }
+}
+
+@media all and (max-width: 520px){
+    .form-group {
+        width: 95.1%;
+    }
+}
+
+@media all and (max-width: 500px){
+    .form-group {
+        width: 94.8%;
+    }
+}
+@media all and (max-width: 470px){
+    .form-group {
+        width: 93.8%;
+    }
+}
