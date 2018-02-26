@@ -1,8 +1,9 @@
 $(document).ready(function() {
     $("#aa").on("click", function () {
         var codigo = $("#codigo").val();
-        var quebra = codigo.split(' ');
+        var quebra = codigo.split('');
 
-        alert(quebra[6]);
+        alert(quebra[5] == "\n");
     });
 });
+
