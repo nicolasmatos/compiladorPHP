@@ -34,8 +34,13 @@ function analisar() {
         }
 
         //Identificador
-        else if ((caracter == 60) || (caracter >= 65 && caracter <= 90) || (caracter >= 97 && caracter <= 122)) {
+        else if ((caracter == 60) || (caracter == 63) || (caracter >= 65 && caracter <= 90) || (caracter >= 97 && caracter <= 122)) {
             token = validarTokenIdentificador(caracteres);
+        }
+
+        //;
+        else if (caracter == 59) {
+            token = new Token("DELIMITADOR", caracterO, true);
         }
 
         //Caracteres descartados
@@ -47,7 +52,7 @@ function analisar() {
             token = new Token("QUEBRA DE LINHA", caracterO, true);
         }
 
-        console.log(token);
+        //console.log(token);
         for(i = 0; i < token.valor.length; i++) {
             caracteres.shift();
         }
@@ -103,15 +108,18 @@ function validarTokenString(caracteres) {
 
 function validarTokenIdentificador(caracteres) {
     var token = new Token("INDENTIFICADOR", "", true);
-    
+
     var caracter = caracteres[0].charCodeAt(0);
 
-    if((caracter == 60) || (caracter == 62) || (caracter >= 65 && caracter <= 90) || (caracter >= 97 && caracter <= 122)){
+    if (caracter == 63 && caracteres[1].charCodeAt(0) == 62) {
+        token.valor = caracteres[0] + caracteres[1];
+    }
+    else if((caracter == 60) || (caracter == 63) || (caracter >= 65 && caracter <= 90) || (caracter >= 97 && caracter <= 122)){
         token.valor = caracteres[0];
         for (i = 1; i < caracteres.length; i++)
         {
             caracter = caracteres[i].charCodeAt(0);
-            if ((caracter >= 65 && caracter <= 90) || (caracter >= 97 && caracter <= 122) || (caracter >= 48 && caracter <= 57) || caracter == 95 || caracter == 63)
+            if ((caracter >= 65 && caracter <= 90) || (caracter >= 97 && caracter <= 122) || (caracter >= 48 && caracter <= 57) || caracter == 95 || caracter == 63 || caracter == 62)
             {
                 token.valor = token.valor + caracteres[i];
             }
