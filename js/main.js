@@ -1,5 +1,5 @@
 $(document).ready(function(){
-    $("#primeiro").focus();
+    /*$("#primeiro").focus();
     $(".pula").on("keydown", (function(e) {
 
         if(e.which == 13){
@@ -32,5 +32,12 @@ $(document).ready(function(){
                 });
             }
         }
-    }));
+    }));*/
+
+   $("#codigo").on("keydown", (function(e) {
+       if(e.which == 13 || e.which == 8){
+            var tam = $(this).height();
+            $('.numbers').css("height", (tam+4)+"px");
+       }
+   }));
 });
