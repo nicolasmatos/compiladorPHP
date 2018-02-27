@@ -3,11 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>Compilador PHP</title>
+
+    <link rel="shortcut icon" href="imagens/favicon.png">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <div style="border: none; min-height: 0; height: 100%" class="container">
+        <div class="row">
+            <div class="col-md-12 col-xs-12" style="padding: 0; margin: 0">
+                <img src="imagens/logoJsPHP.png" width="200">
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="padding: 0; border: none; min-height: 0; height: 100%">
+        <div class="col-md-12 col-xs-12" style="padding: 0">
+            <textarea name="codigo" id="codigo" class="resizable_textarea" cols="30" rows="10" style="width: 100%; min-height: 300px"><?php
+echo "Hello World!";
+?></textarea><br>
+            <button onclick="analisar()" id="compilar" class="btn btn-info">Compilar</button>
+        </div>
+    </div>
+
+    <div id="tabelas" style="border: none; min-height: 0; height: 100%" class="container">
+
+    </div>
+
     <div class="container">
         <div class="numbers">
             <p>01</p>
@@ -35,14 +58,6 @@
 
         <div totalLinha = "1" class="form-group">
             <input id="primeiro" type="text" linha = "1" class="form-control pula">
-        </div>
-    </div>
-    <div class="container" style="padding: 0;">
-        <div class="col-md-12 col-xs-12" style="padding: 0">
-            <textarea name="codigo" id="codigo" class="resizable_textarea" cols="30" rows="10" style="width: 100%;"><?php
-echo "Hello World!";
-?></textarea><br>
-            <button onclick="analisar()" id="compilar">Compilar</button>
         </div>
     </div>
 

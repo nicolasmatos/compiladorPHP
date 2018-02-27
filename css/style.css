@@ -59,6 +59,10 @@ body{
     width: 97.97%;
 }
 
+.equipe {
+    color: white;
+}
+
 @media all and (max-width: 1200px){
     .form-group {
         width: 97.5%;

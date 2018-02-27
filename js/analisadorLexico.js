@@ -11,6 +11,8 @@ var tokensGlobais = [];
 
 //Função geral, responsavel pelo começo da validação do código
 function analisar() {
+    tokensGlobais = [];
+
     var codigo = $("#codigo").val();
     var caracteres = codigo.split('');
 
