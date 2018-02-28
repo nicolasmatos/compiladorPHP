@@ -1,6 +1,17 @@
 body{
     background-color: #333333;
 }
+
+.table{
+    color: white;
+}
+
+input {
+    background-color: transparent;
+    border: 0;
+    color: #ffffff;
+}
+
 .container{
     margin-top: 50px;
     border: 1px solid #999999;

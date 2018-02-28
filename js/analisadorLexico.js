@@ -77,36 +77,56 @@ function analisar() {
     }
 
     console.log(tokensGlobais);
+
+    //Habilitando a tabela com as classificações
+    $("#tabela").css("visibility","visible");
+
+    //Lipando a tabela com as classificações
+    $("#tabela").find("tbody").find(".linha").remove();
+
+    //Adicionando as linhas na tabela de classificação
+    $.each(tokensGlobais, function( key, value ) {
+        if ((value.tipo !== "ESPAÇO") && (value.tipo !== "QUEBRA DE LINHA")) {
+            //alert(value.valor);
+            value.detalhe = value.detalhe == undefined ? "" : value.detalhe;
+            value.valido = value.valido ? "Válido" : "Inválido";
+            $("#tabela").find("tbody").append("<tr class='linha'>" +
+                                                "<td>-</td>" +
+                                                "<td>-</td>" +
+                                                "<td>-</td>" +
+                                                "<td><input type='text' readonly value='" + value.valor + "'</td>" +
+                                                "<td>" + value.tipo + "</td>" +
+                                                "<td>" + value.detalhe + "</td>" +
+                                                "<td>" + value.valido + "</td>" +
+                                              "</tr>");
+        }
+    });
 }
 
 function validarTokenNumerico(caracteres) {
-    /*Token token = new Token("", Token.TipoDeToken.Numerico, "NUMERICO");
-    bool ponto = false;
+    var token = new Token("NUMERICO", "", true, "");
+    var ponto = false;
 
-    for (int i = 0; i < subPrograma.Count(); i++)
-    {
-        int caracter = Convert.ToInt32(subPrograma[i]);
-        if (caracter >= 48 && caracter <= 57)
-        {
-            token.Valor += subPrograma[i];
+    for (i = 0; i < caracteres.length; i++) {
+        var caracter = caracteres[i].charCodeAt(0);
+        if (caracter >= 48 && caracter <= 57) {
+            token.valor += caracteres[i];
         }
-        else if (caracter == 46 && !ponto)
-        {
-            token.Valor += subPrograma[i];
+        else if (caracter == 46 && !ponto) {
+            token.valor += caracteres[i];
             ponto = true;
-        }else{
-            if (token.Valor.Length > 0)
-            {
+        }
+        else {
+            if (token.valor.length > 0) {
                 break;
             }
-            else
-            {
-                token.Valido = false;
+            else {
+                token.valido = false;
             }
         }
     }
 
-    return token;*/
+    return token;
 }
 
 function validarTokenString(caracteres) {
