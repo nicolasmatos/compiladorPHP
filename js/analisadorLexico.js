@@ -1,3 +1,9 @@
+$(document).ready(function(){
+    $("#codigo").on("keyup", (function(e) {
+        analisar();
+    }));
+});
+
 //Objeto para os Tokens
 function Token(tipo, valor, valido, detalhe) {
     this.tipo = tipo;
@@ -54,7 +60,7 @@ function analisar() {
         else {
             if (caracteres.length > 1) {
                 //Comentario
-                if (caracteres[0] + caracteres[1] == "//") {
+                if ((caracteres[0] + caracteres[1] == "//") || (caracteres[0] + caracteres[1] == "/*")) {
                     token = validarTokenComentario(caracteres);
                 }
                 else {
@@ -190,20 +196,28 @@ function validarTokenIdentificador(caracteres) {
 function validarTokenComentario(caracteres) {
     var token = new Token("COMENTÁRIO", "", true);
 
-    //Verifica se o subprograma é maior que zero
-    if (caracteres.length > 1) {
-        //Verifica se os dois primeiros caracteres são //
-        if (caracteres[0] == '/' && caracteres[1] == '/') {
-            token.valor = "//";
+    if (caracteres[0] + caracteres[1] == "//") {
 
-            //Concatena todos os caracteres no comentario até achar um \n
-            for (i = 2; i < caracteres.length; i++) {
-                if (caracteres[i] != '\n') {
-                    token.valor += caracteres[i];
+        token.detalhe = "COMENTÁRIO EM LINHA";
+
+        //Verifica se o subprograma é maior que zero
+        if (caracteres.length > 1) {
+            //Verifica se os dois primeiros caracteres são //
+            if (caracteres[0] == '/' && caracteres[1] == '/') {
+                token.valor = "//";
+
+                //Concatena todos os caracteres no comentario até achar um \n
+                for (i = 2; i < caracteres.length; i++) {
+                    if (caracteres[i] != '\n') {
+                        token.valor += caracteres[i];
+                    }
+                    else {
+                        break;
+                    }
                 }
-                else {
-                    break;
-                }
+            }
+            else {
+                token.valido = false;
             }
         }
         else {
@@ -211,9 +225,29 @@ function validarTokenComentario(caracteres) {
         }
     }
     else {
-        token.valido = false;
-    }
+        var fechamento = false;
+        token.detalhe = "COMENTÁRIO EM BLOCO";
 
+        for (i = 2; i < caracteres.length; i++) {
+            if (token.valido) {
+                if (caracteres[i] != '\/') {
+                    token.valor += caracteres[i];
+                }
+                else {
+                    token.valor = "\/*" + token.valor + "\/";
+                    fechamento = true;
+                    break;
+                }
+            }
+            else {
+                break;
+            }
+        }
+
+        if (!fechamento) {
+            token.valido = false;
+        }
+    }
 
     return token;
 }
