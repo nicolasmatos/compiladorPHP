@@ -1,7 +1,25 @@
 $(document).ready(function(){
+    $('textarea').bind('keydown', function(e) {
+        if(e.keyCode === 9) {
+            e.preventDefault();
+            var inicioDaSelecao = this.selectionStart,
+                fimDaSelecao = this.selectionEnd,
+                recuo = '\t'; //Experimente também com '    '
+
+            this.value = [
+                this.value.substring(0, inicioDaSelecao),
+                recuo,
+                this.value.substring(fimDaSelecao)
+            ].join('');
+
+            this.selectionEnd = inicioDaSelecao + recuo.length;
+        }
+    });
+
     $("#codigo").on("keyup", (function(e) {
         analisar();
     }));
+    analisar();
 });
 
 //Objeto para os Tokens
@@ -12,7 +30,7 @@ function Token(tipo, valor, valido, detalhe) {
     this.valido = valido;
 }
 
-var palavrasReservadas = ['__halt_compiler', 'abstract', 'and', 'array', 'as', 'break', 'callable', 'case', 'catch', 'class', 'clone', 'const', 'continue', 'declare', 'default', 'die', 'do', 'echo', 'else', 'elseif', 'empty', 'enddeclare', 'endfor', 'endforeach', 'endif', 'endswitch', 'endwhile', 'eval', 'exit', 'extends', 'final', 'for', 'foreach', 'function', 'global', 'goto', 'if', 'implements', 'include', 'include_once', 'instanceof', 'insteadof', 'interface', 'isset', 'list', 'namespace', 'new', 'or', 'print', 'private', 'protected', 'public', 'require', 'require_once', 'return', 'static', 'switch', 'throw', 'trait', 'try', 'unset', 'use', 'var', 'while', 'xor'];
+var palavrasReservadas = ['<?php', '?>', '__halt_compiler', 'abstract', 'and', 'array', 'as', 'break', 'callable', 'case', 'catch', 'class', 'clone', 'const', 'continue', 'declare', 'default', 'die', 'do', 'echo', 'else', 'elseif', 'empty', 'enddeclare', 'endfor', 'endforeach', 'endif', 'endswitch', 'endwhile', 'eval', 'exit', 'extends', 'final', 'for', 'foreach', 'function', 'global', 'goto', 'if', 'implements', 'include', 'include_once', 'instanceof', 'insteadof', 'interface', 'isset', 'list', 'namespace', 'new', 'or', 'print', 'private', 'protected', 'public', 'require', 'require_once', 'return', 'static', 'switch', 'throw', 'trait', 'try', 'unset', 'use', 'var', 'while', 'xor'];
 
 var tokensGlobais = [];
 
@@ -79,6 +97,12 @@ function analisar() {
             caracteres.shift();
         }
 
+        if (token.tipo == "IDENTIFICADOR") {
+            if (palavrasReservadas.indexOf(token.valor) > -1) {
+                token.detalhe = "PALAVRA RESERVADA"
+            }
+        }
+
         tokensGlobais.push(token);
     }
 
@@ -92,7 +116,7 @@ function analisar() {
 
     //Adicionando as linhas na tabela de classificação
     $.each(tokensGlobais, function( key, value ) {
-        if ((value.tipo !== "ESPAÇO") && (value.tipo !== "QUEBRA DE LINHA")) {
+        if ((value.tipo !== "ESPAÇO") && (value.tipo !== "QUEBRA DE LINHA") && (value.valor !== "\t")) {
             //alert(value.valor);
             value.detalhe = value.detalhe == undefined ? "" : value.detalhe;
             value.valido = value.valido ? "Válido" : "Inválido";
