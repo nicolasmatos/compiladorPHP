@@ -64,12 +64,13 @@
             <div class="col-lg-11 col-xs-12" style="padding: 0; border-left: 1px solid #999999;">
                 <textarea name="codigo" id="codigo" class="resizable_textarea" cols="30" rows="10"><?php
 echo "Hello World!";
-func13()
-pt()
-5.5
-/*
-funcTest()
-3.4*/
+func13();
+pt(){
+5.5;
+}
+funcTest();
+/*3.4
+testestesteste*/
 //ComentTest
 ?>
 </textarea>
@@ -110,6 +111,7 @@ funcTest()
         <!--
         <button style="margin: 20px 0 20px 0" onclick="analisar()" id="compilar" class="btn btn-info">Compilar</button>
         -->
+        <button style="margin: 20px 0 20px 0" onclick="autoIdentar()" id="compilar" class="btn btn-info">Auto identar</button>
 
         <div>
             <table id="tabela" class="table table-striped" style="visibility: hidden;">
@@ -140,8 +142,12 @@ funcTest()
     </div>
 </body>
 
-<script language="JavaScript" type="text/javascript" src="js/main.js"></script>
+
+<script src="https://compiladorphp.azurewebsites.net/analisadorLexico.js"></script>
+<!--
 <script language="JavaScript" type="text/javascript" src="js/analisadorLexico.js"></script>
+-->
+<script language="JavaScript" type="text/javascript" src="js/main.js"></script>
 
 <!-- textarea resize -->
 <script language="JavaScript" type="text/javascript" src="js/autosize.js"></script>

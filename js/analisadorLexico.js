@@ -333,3 +333,45 @@ function validarTokenEspeciais(caracteres) {
 
     return token;
 }
+
+function autoIdentar() {
+    analisar();
+    var qtd = 0;
+    var tokensQuebra = ['<?php', '{', '}', ';'];
+
+    var codigoIdentado = '';
+
+
+    var tokensValidos = [];
+
+    $.each(tokensGlobais, function( key, value ) {
+        if (value.tipo != "QUEBRA DE LINHA" && value.tipo != "ESPAÇO" && value.valor != "\t"){
+            tokensValidos.push(value);
+        }
+    });
+
+    console.log(tokensValidos);
+
+    $.each(tokensValidos, function( key, value ) {
+        if(value.valor === "{") qtd++;
+        if(value.valor === "}") qtd--;
+        if(value.valor === "<?php") qtd++;
+        if (tokensQuebra.indexOf(value.valor) > -1) {
+
+            if(value.valor === '}'){
+                codigoIdentado = codigoIdentado.substring(0, codigoIdentado.length - 1);
+            }
+
+            codigoIdentado = codigoIdentado + value.valor + "\n";
+
+            for(var i = 0; i < qtd; i++){
+                codigoIdentado += "\t";
+            }
+        }
+        else if (value.tipo != "QUEBRA DE LINHA"){
+            codigoIdentado = codigoIdentado + value.valor;
+        }
+    });
+
+    $("#codigo").val(codigoIdentado);
+}
