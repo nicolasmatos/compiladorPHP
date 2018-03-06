@@ -92,7 +92,6 @@ function analisar() {
             }
         }
 
-        //console.log(token);
         for(i = 0; i < token.valor.length; i++) {
             caracteres.shift();
         }
@@ -106,29 +105,33 @@ function analisar() {
         tokensGlobais.push(token);
     }
 
-    console.log(tokensGlobais);
-
     //Habilitando a tabela com as classificações
     $("#tabela").css("visibility","visible");
 
     //Lipando a tabela com as classificações
     $("#tabela").find("tbody").find(".linha").remove();
 
+    var tokensVisitado = [];
+
     //Adicionando as linhas na tabela de classificação
     $.each(tokensGlobais, function( key, value ) {
-        if ((value.tipo !== "ESPAÇO") && (value.tipo !== "QUEBRA DE LINHA") && (value.valor !== "\t")) {
-            //alert(value.valor);
-            value.detalhe = value.detalhe == undefined ? "" : value.detalhe;
-            value.valido = value.valido ? "Válido" : "Inválido";
-            $("#tabela").find("tbody").append("<tr class='linha'>" +
-                                                "<td>-</td>" +
-                                                "<td>-</td>" +
-                                                "<td>-</td>" +
-                                                "<td><input type='text' readonly value='" + value.valor + "'</td>" +
-                                                "<td>" + value.tipo + "</td>" +
-                                                "<td>" + value.detalhe + "</td>" +
-                                                "<td>" + value.valido + "</td>" +
-                                              "</tr>");
+        if (tokensVisitado.indexOf(value.valor) == -1) {
+            if ((value.tipo !== "ESPAÇO") && (value.tipo !== "QUEBRA DE LINHA") && (value.valor !== "\t")) {
+                //alert(value.valor);
+                value.detalhe = value.detalhe == undefined ? "" : value.detalhe;
+                value.valido = value.valido ? "Válido" : "Inválido";
+                $("#tabela").find("tbody").append("<tr class='linha'>" +
+                    "<td>-</td>" +
+                    "<td>-</td>" +
+                    "<td>-</td>" +
+                    "<td><input type='text' readonly value='" + value.valor + "'</td>" +
+                    "<td>" + value.tipo + "</td>" +
+                    "<td>" + value.detalhe + "</td>" +
+                    "<td>" + value.valido + "</td>" +
+                    "</tr>");
+
+                tokensVisitado.push(value.valor);
+            }
         }
     });
 }
@@ -349,8 +352,6 @@ function autoIdentar() {
             tokensValidos.push(value);
         }
     });
-
-    console.log(tokensValidos);
 
     $.each(tokensValidos, function( key, value ) {
         if(value.valor === "{") qtd++;
