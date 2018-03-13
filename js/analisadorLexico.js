@@ -212,14 +212,20 @@ function validarTokenIdentificador(caracteres) {
             token.detalhe = "VARIÁVEL GLOBAL";
 
         token.valor = caracteres[0];
-        for (i = 1; i < caracteres.length; i++) {
-            caracter = caracteres[i].charCodeAt(0);
-            if ((caracter >= 65 && caracter <= 90) || (caracter >= 97 && caracter <= 122)|| (caracter >= 48 && caracter <= 57) || caracter == 95) {
-                token.valor = token.valor + caracteres[i];
-            }
-            else break;
+        if (caracteres[1].charCodeAt(0) >= 48 && caracteres[1].charCodeAt(0) <= 57) {
+            token.valor += caracteres[1];
+            token.valido = false;
         }
-        token.valido = true;
+        else {
+            for (i = 1; i < caracteres.length; i++) {
+                caracter = caracteres[i].charCodeAt(0);
+                if ((caracter >= 65 && caracter <= 90) || (caracter >= 97 && caracter <= 122) || (caracter >= 48 && caracter <= 57) || caracter == 95) {
+                    token.valor = token.valor + caracteres[i];
+                }
+                else break;
+            }
+            token.valido = true;
+        }
     }
     else if ((caracter == 60) || (caracter == 63) || (caracter >= 65 && caracter <= 90) || (caracter >= 97 && caracter <= 122)) {
         token.valor = caracteres[0];
@@ -237,7 +243,7 @@ function validarTokenIdentificador(caracteres) {
     }
 
     for (i = token.valor.length; i < caracteres.length; i++) {
-        if (caracteres[i] == " ") {}
+        if (caracteres[i] == " " || caracteres[i] == "\t") {}
         else if (caracteres[i] == "(") {
             token.detalhe = "FUNÇÃO";
             break;
