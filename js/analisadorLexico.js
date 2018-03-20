@@ -102,6 +102,10 @@ function analisar() {
             if (palavrasReservadas.indexOf(token.valor) > -1) {
                 token.detalhe = "PALAVRA RESERVADA"
             }
+            if (token.detalhe != "FUNÇÃO" && token.detalhe != "VARIÁVEL GLOBAL" && token.detalhe != "VARIÁVEL LOCAL" && token.detalhe != "PALAVRA RESERVADA") {
+                token.detalhe = "";
+                token.valido = false;
+            }
         }
 
         tokensGlobais.push(token);
@@ -142,21 +146,32 @@ function validarTokenNumerico(caracteres) {
     var token = new Token("NUMERICO", "", true, "");
     var ponto = false;
 
-    for (i = 0; i < caracteres.length; i++) {
-        var caracter = caracteres[i].charCodeAt(0);
-        if (caracter >= 48 && caracter <= 57) {
+    if ((caracteres[1].charCodeAt(0) >= 65 && caracteres[1].charCodeAt(0) <= 90) || (caracteres[1].charCodeAt(0) >= 97 && caracteres[1].charCodeAt(0) <= 122)) {
+        for (i = 0; i < caracteres.length; i++) {
             token.valor += caracteres[i];
-        }
-        else if (caracter == 46 && !ponto) {
-            token.valor += caracteres[i];
-            ponto = true;
-        }
-        else {
-            if (token.valor.length > 0) {
+            if (caracteres[i] == " " || caracteres[i] == "(") {
                 break;
             }
+        }
+        token.valido = false;
+    }
+    else {
+        for (i = 0; i < caracteres.length; i++) {
+            var caracter = caracteres[i].charCodeAt(0);
+            if (caracter >= 48 && caracter <= 57) {
+                token.valor += caracteres[i];
+            }
+            else if (caracter == 46 && !ponto) {
+                token.valor += caracteres[i];
+                ponto = true;
+            }
             else {
-                token.valido = false;
+                if (token.valor.length > 0) {
+                    break;
+                }
+                else {
+                    token.valido = false;
+                }
             }
         }
     }
