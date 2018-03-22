@@ -262,7 +262,7 @@ function validarTokenIdentificador(caracteres) {
         }
 
         if (escopo != 0) {
-            for(i = tokensGlobais.length - 1; i > 0; i--) {
+            for(i = tokensGlobais.length - 1; i >= 0; i--) {
                 if(tokensGlobais[i].detalhe == "FUNÇÃO") {
                     token.valor += "." + tokensGlobais[i].valor;
                     break;
@@ -364,6 +364,11 @@ function validarTokenEspeciais(caracteres) {
     if (caracteres[0] == "{")
         escopo++;
     if (caracteres[0] == "}")
+        escopo--;
+
+    if (caracteres[0] == "(")
+        escopo++;
+    if (caracteres[0] == ")")
         escopo--;
 
     operadoresUmChar.push(
