@@ -172,6 +172,27 @@ function validarTokenNumerico(caracteres) {
                 if (caracteres[j] != "\n" && caracteres[j] != ";") {
                     if (caracter2 == 45 || (caracter2 >= 48 && caracter2 <= 57)) {
                         token.valor += caracteres[j];
+                        var ponto = false;
+
+                        for (k = j + 1; k < caracteres.length; k++) {
+                            var caracter = caracteres[k].charCodeAt(0);
+                            if (caracter >= 48 && caracter <= 57) {
+                                token.valor += caracteres[k];
+                            }
+                            else if (caracter == 46 && !ponto) {
+                                token.valor += caracteres[k];
+                                ponto = true;
+                            }
+                            else {
+                                if (token.valor.length > 0) {
+                                    break;
+                                }
+                                else {
+                                    token.valido = false;
+                                }
+                            }
+                        }
+                        break;
                     }
                     else {
                         if (token.valor.length > 0) {
