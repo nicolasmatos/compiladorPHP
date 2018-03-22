@@ -39,6 +39,7 @@ var escopo = 0;
 //Função geral, responsavel pelo começo da validação do código
 function analisar() {
     tokensGlobais = [];
+    escopo = 0;
 
     var codigo = $("#codigo").val();
     var caracteres = codigo.split('');
@@ -94,7 +95,15 @@ function analisar() {
             }
         }
 
-        for(i = 0; i < token.valor.length; i++) {
+        var tam = 0;
+        if(token.detalhe == "VARIÁVEL LOCAL") {
+            var valorQ = (token.valor).split(".");
+            tam = valorQ[0].length;
+        }
+        else {
+            tam = token.valor.length;
+        }
+        for(i = 0; i < tam; i++) {
             caracteres.shift();
         }
 
@@ -146,32 +155,42 @@ function validarTokenNumerico(caracteres) {
     var token = new Token("NUMERICO", "", true, "");
     var ponto = false;
 
-    if ((caracteres[1].charCodeAt(0) >= 65 && caracteres[1].charCodeAt(0) <= 90) || (caracteres[1].charCodeAt(0) >= 97 && caracteres[1].charCodeAt(0) <= 122)) {
-        for (i = 0; i < caracteres.length; i++) {
+    for (i = 0; i < caracteres.length; i++) {
+        var caracter = caracteres[i].charCodeAt(0);
+        if (caracter >= 48 && caracter <= 57) {
             token.valor += caracteres[i];
-            if (caracteres[i] == " " || caracteres[i] == "(") {
+        }
+        else if (caracter == 46 && !ponto) {
+            token.valor += caracteres[i];
+            ponto = true;
+        }
+        else if (caracter == 69 || caracter == 101) {
+            token.valor += caracteres[i];
+            token.detalhe = "NOTAÇÃO";
+            for (j = i + 1; j < caracteres.length; j++) {
+                var caracter2 = caracteres[j].charCodeAt(0);
+                if (caracteres[j] != "\n" && caracteres[j] != ";") {
+                    if (caracter2 == 45 || (caracter2 >= 48 && caracter2 <= 57)) {
+                        token.valor += caracteres[j];
+                    }
+                    else {
+                        if (token.valor.length > 0) {
+                            break;
+                        }
+                        else {
+                            token.valido = false;
+                        }
+                    }
+                }
+            }
+            break;
+        }
+        else {
+            if (token.valor.length > 0) {
                 break;
             }
-        }
-        token.valido = false;
-    }
-    else {
-        for (i = 0; i < caracteres.length; i++) {
-            var caracter = caracteres[i].charCodeAt(0);
-            if (caracter >= 48 && caracter <= 57) {
-                token.valor += caracteres[i];
-            }
-            else if (caracter == 46 && !ponto) {
-                token.valor += caracteres[i];
-                ponto = true;
-            }
             else {
-                if (token.valor.length > 0) {
-                    break;
-                }
-                else {
-                    token.valido = false;
-                }
+                token.valido = false;
             }
         }
     }
@@ -240,6 +259,15 @@ function validarTokenIdentificador(caracteres) {
                 else break;
             }
             token.valido = true;
+        }
+
+        if (escopo != 0) {
+            for(i = tokensGlobais.length - 1; i > 0; i--) {
+                if(tokensGlobais[i].detalhe == "FUNÇÃO") {
+                    token.valor += "." + tokensGlobais[i].valor;
+                    break;
+                }
+            }
         }
     }
     else if ((caracter == 60) || (caracter == 63) || (caracter >= 65 && caracter <= 90) || (caracter >= 97 && caracter <= 122)) {
