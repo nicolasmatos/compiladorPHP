@@ -44,6 +44,8 @@ function analisar() {
     escopo = 0;
 
     analizadorLexico();
+    analizadorSintatico();
+    analizadorSemantico();
 
     //Habilitando a tabela com as classificações
     $("#tabela").css("visibility","visible");
@@ -53,6 +55,7 @@ function analisar() {
 
     var tokensVisitado = [];
     var qtd = 1;
+    var linha = 1, coluna = 1;
 
     //Adicionando as linhas na tabela de classificação
     $.each(tokensGlobais, function( key, value ) {
@@ -63,8 +66,8 @@ function analisar() {
                 value.valido = value.valido ? "Válido" : "Inválido";
                 $("#tabela").find("tbody").append("<tr class='linha'>" +
                     "<td>"+ (qtd++) +"</td>" +
-                    "<td>-</td>" +
-                    "<td>-</td>" +
+                    "<td>"+ linha +"</td>" +
+                    "<td>"+ (coluna++) +"</td>" +
                     "<td>-</td>" +
                     "<td>" + value.escopo + "</td>" +
                     "<td><input type='text' readonly value='" + value.valor + "'</td>" +
@@ -74,6 +77,10 @@ function analisar() {
                     "</tr>");
 
                 tokensVisitado.push(value.valor);
+            }
+            else if (value.tipo === "QUEBRA DE LINHA") {
+                linha++;
+                coluna = 1;
             }
         //}
     });
@@ -158,6 +165,14 @@ function analizadorLexico() {
 
         tokensGlobais.push(token);
     }
+}
+
+function analizadorSintatico() {
+
+}
+
+function analizadorSemantico() {
+
 }
 
 function validarTokenNumerico(caracteres) {
