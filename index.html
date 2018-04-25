@@ -6,7 +6,9 @@
 
     <link rel="shortcut icon" href="imagens/favicon.png">
     <script src="js/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">/-->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -63,19 +65,20 @@
 
             <div class="col-lg-11 col-xs-12" style="padding: 0; border-left: 1px solid #999999;">
                 <textarea name="codigo" id="codigo" class="resizable_textarea" cols="30" rows="10"><?php
-$global = 1;
-1e10;
-echo "Hello World!";
-func13();
-pt(){
-5.5;
-$local = 2;
+function main(){
+	$a = 0;
+	$b = 0;
+	$c = 2;
+	$x = 0.0;
+	$y = 0.0;
+	$z=2.0;
+	read($b);
+	read($y);
+	$a=($b*$c)/3+5;
+	$x=(($y*$c)/($b-$c))*$a-7;
+	echo("a= ".$a);
+	echo("x= ".$x);
 }
-$global1 = 3;
-funcTest();
-/*3.4
-testestesteste*/
-//ComentTest
 ?>
 </textarea>
                 <br>
@@ -121,9 +124,11 @@ testestesteste*/
             <table id="tabela" class="table table-striped" style="visibility: hidden;">
                 <thead>
                     <tr>
+                        <th scope="col">Nº</th>
                         <th scope="col">Linha</th>
                         <th scope="col">Coluna</th>
                         <th scope="col">Código</th>
+                        <th scope="col">Escopo</th>
                         <th scope="col">Valor</th>
                         <th scope="col">Tipo</th>
                         <th scope="col">Subtipo</th>
@@ -132,6 +137,8 @@ testestesteste*/
                 </thead>
                 <tbody>
                     <tr>
+                        <td></td>
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>

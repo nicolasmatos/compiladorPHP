@@ -19,15 +19,17 @@ $(document).ready(function(){
     $("#codigo").on("keyup", (function(e) {
         analisar();
     }));
+
     analisar();
 });
 
 //Objeto para os Tokens
-function Token(tipo, valor, valido, detalhe) {
+function Token(tipo, valor, valido, detalhe, escopo) {
     this.tipo = tipo;
     this.valor = valor;
     this.detalhe = detalhe;
     this.valido = valido;
+    this.escopo = escopo;
 }
 
 var palavrasReservadas = ['<?php', '?>', '__halt_compiler', 'abstract', 'and', 'array', 'as', 'break', 'callable', 'case', 'catch', 'class', 'clone', 'const', 'continue', 'declare', 'default', 'die', 'do', 'echo', 'else', 'elseif', 'empty', 'enddeclare', 'endfor', 'endforeach', 'endif', 'endswitch', 'endwhile', 'eval', 'exit', 'extends', 'final', 'for', 'foreach', 'function', 'global', 'goto', 'if', 'implements', 'include', 'include_once', 'instanceof', 'insteadof', 'interface', 'isset', 'list', 'namespace', 'new', 'or', 'print', 'private', 'protected', 'public', 'require', 'require_once', 'return', 'static', 'switch', 'throw', 'trait', 'try', 'unset', 'use', 'var', 'while', 'xor'];
@@ -41,6 +43,43 @@ function analisar() {
     tokensGlobais = [];
     escopo = 0;
 
+    analizadorLexico();
+
+    //Habilitando a tabela com as classificações
+    $("#tabela").css("visibility","visible");
+
+    //Lipando a tabela com as classificações
+    $("#tabela").find("tbody").find(".linha").remove();
+
+    var tokensVisitado = [];
+    var qtd = 1;
+
+    //Adicionando as linhas na tabela de classificação
+    $.each(tokensGlobais, function( key, value ) {
+        //if (tokensVisitado.indexOf(value.valor) == -1) {
+            if ((value.tipo !== "ESPAÇO") && (value.tipo !== "QUEBRA DE LINHA") && (value.valor !== "\t")) {
+                //alert(value.valor);
+                value.detalhe = value.detalhe == undefined ? "" : value.detalhe;
+                value.valido = value.valido ? "Válido" : "Inválido";
+                $("#tabela").find("tbody").append("<tr class='linha'>" +
+                    "<td>"+ (qtd++) +"</td>" +
+                    "<td>-</td>" +
+                    "<td>-</td>" +
+                    "<td>-</td>" +
+                    "<td>" + value.escopo + "</td>" +
+                    "<td><input type='text' readonly value='" + value.valor + "'</td>" +
+                    "<td>" + value.tipo + "</td>" +
+                    "<td>" + value.detalhe + "</td>" +
+                    "<td>" + value.valido + "</td>" +
+                    "</tr>");
+
+                tokensVisitado.push(value.valor);
+            }
+        //}
+    });
+}
+
+function analizadorLexico() {
     var codigo = $("#codigo").val();
     var caracteres = codigo.split('');
 
@@ -70,11 +109,11 @@ function analisar() {
 
         //Caracteres descartados
         else if (caracter == 32) {
-            token = new Token("ESPAÇO", caracterO, true);
+            token = new Token("ESPAÇO", caracterO, true, "", escopo);
         }
 
         else if (caracter == 10) {
-            token = new Token("QUEBRA DE LINHA", caracterO, true);
+            token = new Token("QUEBRA DE LINHA", caracterO, true, "", escopo);
         }
 
         //Tokens especiais
@@ -119,40 +158,10 @@ function analisar() {
 
         tokensGlobais.push(token);
     }
-
-    //Habilitando a tabela com as classificações
-    $("#tabela").css("visibility","visible");
-
-    //Lipando a tabela com as classificações
-    $("#tabela").find("tbody").find(".linha").remove();
-
-    var tokensVisitado = [];
-
-    //Adicionando as linhas na tabela de classificação
-    $.each(tokensGlobais, function( key, value ) {
-        if (tokensVisitado.indexOf(value.valor) == -1) {
-            if ((value.tipo !== "ESPAÇO") && (value.tipo !== "QUEBRA DE LINHA") && (value.valor !== "\t")) {
-                //alert(value.valor);
-                value.detalhe = value.detalhe == undefined ? "" : value.detalhe;
-                value.valido = value.valido ? "Válido" : "Inválido";
-                $("#tabela").find("tbody").append("<tr class='linha'>" +
-                    "<td>-</td>" +
-                    "<td>-</td>" +
-                    "<td>-</td>" +
-                    "<td><input type='text' readonly value='" + value.valor + "'</td>" +
-                    "<td>" + value.tipo + "</td>" +
-                    "<td>" + value.detalhe + "</td>" +
-                    "<td>" + value.valido + "</td>" +
-                    "</tr>");
-
-                tokensVisitado.push(value.valor);
-            }
-        }
-    });
 }
 
 function validarTokenNumerico(caracteres) {
-    var token = new Token("NUMERICO", "", true, "");
+    var token = new Token("NUMERICO", "", true, "", escopo);
     var ponto = false;
 
     for (i = 0; i < caracteres.length; i++) {
@@ -220,7 +229,7 @@ function validarTokenNumerico(caracteres) {
 }
 
 function validarTokenString(caracteres) {
-    var token = new Token("STRING", "", true);
+    var token = new Token("STRING", "", true, "", escopo);
     var fechamento = false;
 
     if (caracteres[0] == '\"') {
@@ -252,7 +261,7 @@ function validarTokenString(caracteres) {
 }
 
 function validarTokenIdentificador(caracteres) {
-    var token = new Token("IDENTIFICADOR", "", true);
+    var token = new Token("IDENTIFICADOR", "", true, "", escopo);
 
     var caracter = caracteres[0].charCodeAt(0);
     //alert(caracter);
@@ -285,8 +294,10 @@ function validarTokenIdentificador(caracteres) {
         if (escopo != 0) {
             for(i = tokensGlobais.length - 1; i >= 0; i--) {
                 if(tokensGlobais[i].detalhe == "FUNÇÃO") {
-                    token.valor += "." + tokensGlobais[i].valor;
-                    break;
+                    if(tokensGlobais[i].escopo != token.escopo) {
+                        token.valor += "." + tokensGlobais[i].valor;
+                        break;
+                    }
                 }
             }
         }
@@ -306,10 +317,20 @@ function validarTokenIdentificador(caracteres) {
         token.valido = false;
     }
 
-    for (i = token.valor.length; i < caracteres.length; i++) {
+    var tam = 0;
+    if(token.detalhe == "VARIÁVEL LOCAL") {
+        var valorQ = (token.valor).split(".");
+        tam = valorQ[0].length;
+    }
+    else {
+        tam = token.valor.length;
+    }
+
+    for (i = tam; i < caracteres.length; i++) {
         if (caracteres[i] == " " || caracteres[i] == "\t") {}
         else if (caracteres[i] == "(") {
             token.detalhe = "FUNÇÃO";
+            token.escopo = escopo;
             break;
         }
         else {
@@ -321,7 +342,7 @@ function validarTokenIdentificador(caracteres) {
 }
 
 function validarTokenComentario(caracteres) {
-    var token = new Token("COMENTÁRIO", "", true);
+    var token = new Token("COMENTÁRIO", "", true, "", escopo);
 
     if (caracteres[0] + caracteres[1] == "//") {
 
@@ -379,51 +400,71 @@ function validarTokenComentario(caracteres) {
     return token;
 }
 
+var controleEscopo = 1;
+
 function validarTokenEspeciais(caracteres) {
     var operadoresUmChar = [], operadoresDoisChar = [];
 
-    if (caracteres[0] == "{")
-        escopo++;
     if (caracteres[0] == "}")
         escopo--;
 
-    if (caracteres[0] == "(")
-        escopo++;
-    if (caracteres[0] == ")")
-        escopo--;
+    if (caracteres[0] == ")") {
+        if (controleEscopo)
+            escopo--;
+    }
 
     operadoresUmChar.push(
-        new Token("OPERADOR", "+", true, "OPERADOR DE ADIÇÃO"),
-        new Token("OPERADOR", "-", true, "OPERADOR DE SUBTRAÇÃO"),
-        new Token("OPERADOR", "*", true, "OPERADOR DE MULTIPLICAÇÃO"),
-        new Token("OPERADOR", "/", true, "OPERADOR DE DIVISÃO"),
-        new Token("OPERADOR", "%", true, "OPERADOR DE RESTO"),
-        new Token("OPERADOR", "^", true, "OPERADOR DE POTENCIAÇÃO"),
-        new Token("OPERADOR", "<", true, "OPERADOR MENOR QUE"),
-        new Token("OPERADOR", ">", true, "OPERADOR MAIOR QUE"),
-        new Token("ATRIBUIÇÃO", "=", true, "OPERADOR DE ATRIBUIÇÃO"),
-        new Token("PONTUAÇÃO", ",", true, "SEPARADOR DE ARGUMENTOS"),
-        new Token("PONTUAÇÃO", ";", true, "FINALIZADOR DE COMANDO"),
-        new Token("PARENTIZADOR","{", true, "ABERTURA DE CHAVE"),
-        new Token("PARENTIZADOR","[", true, "ABERTURA DE COLCHETE"),
-        new Token("PARENTIZADOR","(", true, "ABERTURA DE PARENTESE"),
-        new Token("PARENTIZADOR",")", true, "FECHAMENTO DE PARENTESE"),
-        new Token("PARENTIZADOR","]", true, "FECHAMENTO DE COLCHETE"),
-        new Token("PARENTIZADOR","}", true, "FECHAMENTO DE CHAVE")
+        new Token("CONCATENAÇÃO", ".", true, "OPERADOR DE CONCATENAÇÃO", escopo),
+        new Token("OPERADOR", "+", true, "OPERADOR DE ADIÇÃO", escopo),
+        new Token("OPERADOR", "-", true, "OPERADOR DE SUBTRAÇÃO", escopo),
+        new Token("OPERADOR", "*", true, "OPERADOR DE MULTIPLICAÇÃO", escopo),
+        new Token("OPERADOR", "/", true, "OPERADOR DE DIVISÃO", escopo),
+        new Token("OPERADOR", "%", true, "OPERADOR DE RESTO", escopo),
+        new Token("OPERADOR", "^", true, "OPERADOR DE POTENCIAÇÃO", escopo),
+        new Token("OPERADOR", "<", true, "OPERADOR MENOR QUE", escopo),
+        new Token("OPERADOR", ">", true, "OPERADOR MAIOR QUE", escopo),
+        new Token("ATRIBUIÇÃO", "=", true, "OPERADOR DE ATRIBUIÇÃO", escopo),
+        new Token("PONTUAÇÃO", ",", true, "SEPARADOR DE ARGUMENTOS", escopo),
+        new Token("PONTUAÇÃO", ";", true, "FINALIZADOR DE COMANDO", escopo),
+        new Token("PARENTIZADOR","{", true, "ABERTURA DE CHAVE", escopo),
+        new Token("PARENTIZADOR","[", true, "ABERTURA DE COLCHETE", escopo),
+        new Token("PARENTIZADOR","(", true, "ABERTURA DE PARENTESE", escopo),
+        new Token("PARENTIZADOR",")", true, "FECHAMENTO DE PARENTESE", escopo),
+        new Token("PARENTIZADOR","]", true, "FECHAMENTO DE COLCHETE", escopo),
+        new Token("PARENTIZADOR","}", true, "FECHAMENTO DE CHAVE", escopo)
     );
 
     operadoresDoisChar.push(
-        new Token("OPERADOR", "++", true, "OPERADOR DE INCREMENTO"),
-        new Token("OPERADOR", "--", true, "OPERADOR DE DECREMENTO"),
-        new Token("OPERADOR", ">=", true, "COMPARADOR MAIOR OU IGUAL QUE"),
-        new Token("OPERADOR", "<=", true, "COMPARADOR MENOR OU IGUAL QUE"),
-        new Token("OPERADOR", "==", true, "COMPARADOR IGUALDADE"),
-        new Token("OPERADOR", "&&", true, "OPERADOR E"),
-        new Token("OPERADOR", "||", true, "OPERADOR OU"),
-        new Token("OPERADOR", "!=", true, "COMPARADOR DIFERENTE")
+        new Token("OPERADOR", "++", true, "OPERADOR DE INCREMENTO", escopo),
+        new Token("OPERADOR", "--", true, "OPERADOR DE DECREMENTO", escopo),
+        new Token("OPERADOR", ">=", true, "COMPARADOR MAIOR OU IGUAL QUE", escopo),
+        new Token("OPERADOR", "<=", true, "COMPARADOR MENOR OU IGUAL QUE", escopo),
+        new Token("OPERADOR", "==", true, "COMPARADOR IGUALDADE", escopo),
+        new Token("OPERADOR", "&&", true, "OPERADOR E", escopo),
+        new Token("OPERADOR", "||", true, "OPERADOR OU", escopo),
+        new Token("OPERADOR", "!=", true, "COMPARADOR DIFERENTE", escopo)
     );
 
     var token = new Token("DESCONHECIDO", " ", true, "");
+
+    if (caracteres[0] == "{")
+        escopo++;
+
+    if (caracteres[0] == "(") {
+        for(i = tokensGlobais.length - 1; i >= 0; i--) {
+            if(tokensGlobais[i].tipo != "ESPAÇO" && tokensGlobais[i].tipo != "QUEBRA DE LINHA") {
+                if(tokensGlobais[i].detalhe == "FUNÇÃO") {
+                    escopo++;
+
+                    controleEscopo = 1;
+                }
+                else {
+                    controleEscopo = 0;
+                }
+                break;
+            }
+        }
+    }
 
     $.each(operadoresUmChar, function( key, value ) {
         if(value.valor == caracteres[0]) {
