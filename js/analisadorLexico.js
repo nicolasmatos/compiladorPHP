@@ -1,4 +1,22 @@
 $(document).ready(function(){
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": true,
+        "positionClass": "toast-bottom-center",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "2500",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
+
     $('textarea').bind('keydown', function(e) {
         if(e.keyCode === 9) {
             e.preventDefault();
@@ -168,7 +186,24 @@ function analizadorLexico() {
 }
 
 function analizadorSintatico() {
+    var ctrExpressao = 0;
+    var parenteses = [];
+    var parentesesAbrindo = [];
+    var parentesesFechando = [];
 
+    $.each(tokensGlobais, function( key, value ) {
+        if (value.detalhe == "ABERTURA DE PARENTESE") {
+            parenteses.push(value);
+            parentesesAbrindo.push(value);
+        }
+        if (value.detalhe == "FECHAMENTO DE PARENTESE") {
+            parenteses.pop();
+            parentesesFechando.push(value);
+        }
+    });
+
+    if((parenteses.length != 0) || (parentesesAbrindo.length != parentesesFechando.length))
+        erroSintatico("Existe algum problema nas estruturas de parênteses. :´(");
 }
 
 function analizadorSemantico() {
@@ -541,4 +576,8 @@ function autoIdentar() {
     });
 
     $("#codigo").val(codigoIdentado);
+}
+
+function erroSintatico(texto) {
+    toastr.warning(""+texto, "Erro sintático.");
 }
