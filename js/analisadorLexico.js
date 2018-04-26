@@ -118,7 +118,7 @@ function analizadorLexico() {
 
         //Verificações para identificar o tipo do caracter lido
         //Numerico
-        if (caracter >= 48 && caracter <= 57) {
+        if ((caracter == 45 && (caracteres[1].charCodeAt(0) >= 48 && caracteres[1].charCodeAt(0) <= 57)) || (caracter >= 48 && caracter <= 57)) {
             token = validarTokenNumerico(caracteres);
         }
 
@@ -190,6 +190,7 @@ function analizadorSintatico() {
     var parenteses = [];
     var parentesesAbrindo = [];
     var parentesesFechando = [];
+    var expressao = [];
 
     $.each(tokensGlobais, function( key, value ) {
         if (value.detalhe == "ABERTURA DE PARENTESE") {
@@ -199,6 +200,104 @@ function analizadorSintatico() {
         if (value.detalhe == "FECHAMENTO DE PARENTESE") {
             parenteses.pop();
             parentesesFechando.push(value);
+        }
+
+        if (value.tipo == "NUMERICO") {
+            //Inicio Valida numérico
+            var aux1 = expressao.pop();
+            var aux2 = expressao.pop();
+
+            if (aux1 != undefined) {
+                if (aux2 != undefined) {
+                    if (aux1 == "OP" && aux2 == "EXPR") {
+                        expressao.push("EXPR");
+                    }
+                    else {
+                        expressao.push(aux2);
+                        expressao.push(aux1);
+                        expressao.push("EXPR");
+                    }
+                }
+                else {
+                    expressao.push(aux1);
+                    expressao.push("EXPR");
+                }
+            }
+            else {
+                expressao.push("EXPR");
+            }
+            //FIM Valida numérico
+        }
+        if (value.detalhe == "ABERTURA DE PARENTESE") {
+            expressao.push("(");
+        }
+        if (value.detalhe == "OPERADOR DE ADIÇÃO" || value.detalhe == "OPERADOR DE SUBTRAÇÃO" || value.detalhe == "OPERADOR DE MULTIPLICAÇÃO" || value.detalhe == "OPERADOR DE DIVISÃO" ) {
+            expressao.push("OP");
+        }
+        if (value.detalhe == "FECHAMENTO DE PARENTESE") {
+            var aux1 = expressao.pop();
+            var aux2 = expressao.pop();
+
+            if (aux1 != undefined) {
+                if (aux2 != undefined) {
+                    if (aux1 == "EXPR" && aux2 == "(") {
+                        //Inicio Valida numérico
+                        var aux1 = expressao.pop();
+                        var aux2 = expressao.pop();
+
+                        if (aux1 != undefined) {
+                            if (aux2 != undefined) {
+                                if (aux1 == "OP" && aux2 == "EXPR") {
+                                    expressao.push("EXPR");
+                                }
+                                else {
+                                    expressao.push(aux2);
+                                    expressao.push(aux1);
+                                    expressao.push("EXPR");
+                                }
+                            }
+                            else {
+                                expressao.push(aux1);
+                                expressao.push("EXPR");
+                            }
+                        }
+                        else {
+                            expressao.push("EXPR");
+                        }
+                        //FIM Valida numérico
+                    }
+                    else {
+                        expressao.push(aux2);
+                        expressao.push(aux1);
+                        expressao.push(")");
+                    }
+                }
+                else {
+                    expressao.push(aux1);
+                    expressao.push(")");
+                }
+            }
+            else {
+                expressao.push(")");
+            }
+        }
+
+        if(expressao.length == 1) {
+            var aux = expressao.pop();
+            if(aux != "EXPR") {
+                expressao = [];
+                erroSintatico("Existe alguma expressão inválida");
+            }
+            else {
+                expressao.push("EXPR")
+            }
+        }
+
+        if (value.tipo == "QUEBRA DE LINHA") {
+            if(expressao.length > 1) {
+                erroSintatico("Existe alguma expressão inválida");
+            }
+            expressao = [];
         }
     });
 
@@ -216,7 +315,7 @@ function validarTokenNumerico(caracteres) {
 
     for (i = 0; i < caracteres.length; i++) {
         var caracter = caracteres[i].charCodeAt(0);
-        if (caracter >= 48 && caracter <= 57) {
+        if ((caracter == 45 && (caracteres[i+1].charCodeAt(0) >= 48 && caracteres[i+1].charCodeAt(0) <= 57)) || (caracter >= 48 && caracter <= 57)) {
             token.valor += caracteres[i];
         }
         else if (caracter == 46 && !ponto) {
