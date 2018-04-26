@@ -192,6 +192,7 @@ function analizadorSintatico() {
     var parentesesFechando = [];
     var expressao = [];
 
+    console.clear();
     $.each(tokensGlobais, function( key, value ) {
         if (value.detalhe == "ABERTURA DE PARENTESE") {
             parenteses.push(value);
@@ -203,6 +204,19 @@ function analizadorSintatico() {
         }
 
         if (value.tipo == "NUMERICO") {
+            if(value.valor < 0) {
+                if(expressao.length !== 0) {
+                    var aux = expressao.pop();
+                    if(aux !== "(") {
+                        expressao.push(aux);
+                        expressao.push("OP");
+                    }
+                    else {
+                        expressao.push(aux);
+                    }
+                }
+            }
+
             //Inicio Valida numérico
             var aux1 = expressao.pop();
             var aux2 = expressao.pop();
@@ -228,26 +242,26 @@ function analizadorSintatico() {
             }
             //FIM Valida numérico
         }
-        if (value.detalhe == "ABERTURA DE PARENTESE") {
+        else if (value.detalhe == "ABERTURA DE PARENTESE") {
             expressao.push("(");
         }
-        if (value.detalhe == "OPERADOR DE ADIÇÃO" || value.detalhe == "OPERADOR DE SUBTRAÇÃO" || value.detalhe == "OPERADOR DE MULTIPLICAÇÃO" || value.detalhe == "OPERADOR DE DIVISÃO" ) {
+        else if (value.detalhe == "OPERADOR DE ADIÇÃO" || value.detalhe == "OPERADOR DE SUBTRAÇÃO" || value.detalhe == "OPERADOR DE MULTIPLICAÇÃO" || value.detalhe == "OPERADOR DE DIVISÃO" ) {
             expressao.push("OP");
         }
-        if (value.detalhe == "FECHAMENTO DE PARENTESE") {
+        else if (value.detalhe == "FECHAMENTO DE PARENTESE") {
             var aux1 = expressao.pop();
             var aux2 = expressao.pop();
 
-            if (aux1 != undefined) {
-                if (aux2 != undefined) {
-                    if (aux1 == "EXPR" && aux2 == "(") {
+            if (aux1 !== undefined) {
+                if (aux2 !== undefined) {
+                    if (aux1 === "EXPR" && aux2 === "(") {
                         //Inicio Valida numérico
                         var aux1 = expressao.pop();
                         var aux2 = expressao.pop();
 
-                        if (aux1 != undefined) {
-                            if (aux2 != undefined) {
-                                if (aux1 == "OP" && aux2 == "EXPR") {
+                        if (aux1 !== undefined) {
+                            if (aux2 !== undefined) {
+                                if (aux1 === "OP" && aux2 === "EXPR") {
                                     expressao.push("EXPR");
                                 }
                                 else {
@@ -282,20 +296,39 @@ function analizadorSintatico() {
             }
         }
 
-        if(expressao.length == 1) {
+        else {
+            if (expressao.length > 0 && value.detalhe !== "FINALIZADOR DE COMANDO" && value.tipo !== "ESPAÇO" && value.tipo !== "QUEBRA DE LINHA")
+                expressao.push("ERRO");
+        }
+
+        if(expressao.length === 1) {
             var aux = expressao.pop();
-            if(aux != "EXPR") {
-                expressao = [];
-                erroSintatico("Existe alguma expressão inválida");
+            if(aux !== "EXPR") {
+                if(aux !== "(") {
+                    expressao = [];
+                    if (aux === "OP")
+                        erroSintatico("Existe um operador sobrando na expressão!");
+                    else if (aux === ")")
+                        erroSintatico("Existe um fechamento de parêntese sobrando na expressão!");
+                    else
+                        erroSintatico("Existe alguma expressão inválida");
+                }
+                else {
+                    expressao.push("(");
+                }
             }
             else {
-                expressao.push("EXPR")
+                expressao.push("EXPR");
             }
         }
 
-        if (value.tipo == "QUEBRA DE LINHA") {
+        if (value.tipo === "QUEBRA DE LINHA" || value.detalhe === "FINALIZADOR DE COMANDO") {
             if(expressao.length > 1) {
                 erroSintatico("Existe alguma expressão inválida");
+            }
+            if(expressao.length != 0) {
+                console.log("-----------------");
+                console.log(expressao);
             }
             expressao = [];
         }
@@ -313,9 +346,11 @@ function validarTokenNumerico(caracteres) {
     var token = new Token("NUMERICO", "", true, "", escopo);
     var ponto = false;
 
-    for (i = 0; i < caracteres.length; i++) {
+    token.valor += caracteres[0];
+
+    for (i = 1; i < caracteres.length; i++) {
         var caracter = caracteres[i].charCodeAt(0);
-        if ((caracter == 45 && (caracteres[i+1].charCodeAt(0) >= 48 && caracteres[i+1].charCodeAt(0) <= 57)) || (caracter >= 48 && caracter <= 57)) {
+        if (caracter >= 48 && caracter <= 57) {
             token.valor += caracteres[i];
         }
         else if (caracter == 46 && !ponto) {
