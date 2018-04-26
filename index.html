@@ -66,8 +66,20 @@
 
             <div class="col-lg-11 col-xs-12" style="padding: 0; border-left: 1px solid #999999;">
                 <textarea name="codigo" id="codigo" class="resizable_textarea" cols="30" rows="10"><?php
-$a = -10-(20+20+(-8));
-$b = (-9)*10-(20+20+8);
+function main(){
+	$a = 0;
+	$b = 0;
+	$c = 2;
+	$x = 0.0;
+	$y = 0.0;
+	$z=2.0;
+	read($b);
+	read($y);
+	$a=($b*$c)/3+5;
+	$x=(($y*$c)/($b-$c))*$a-7;
+	echo("a= ".$a);
+	echo("x= ".$x);
+}
 ?>
 
 </textarea>

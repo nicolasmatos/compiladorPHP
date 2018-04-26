@@ -9,7 +9,7 @@ $(document).ready(function(){
         "onclick": null,
         "showDuration": "300",
         "hideDuration": "1000",
-        "timeOut": "2500",
+        "timeOut": "6000",
         "extendedTimeOut": "1000",
         "showEasing": "swing",
         "hideEasing": "linear",
@@ -196,17 +196,27 @@ function analizadorSintatico() {
     console.clear();
 
     var linha = 1;
+    var controleExpressao = 1;
     $.each(tokensGlobais, function( key, value ) {
         if (value.detalhe == "ABERTURA DE PARENTESE") {
             parenteses.push(value);
             parentesesAbrindo.push(value);
-        }
-        if (value.detalhe == "FECHAMENTO DE PARENTESE") {
-            parenteses.pop();
-            parentesesFechando.push(value);
+
+            //Inicio ignorando os parâmentros de funções
+            var i = 1;
+            while((key - i) >= 0) {
+                if ((tokensGlobais[key - i].tipo !== "ESPAÇO") && (tokensGlobais[key - i].valor !== "\t")) {
+                    if (tokensGlobais[key - i].detalhe === "FUNÇÃO" || tokensGlobais[key - i].detalhe === "PALAVRA RESERVADA") {
+                        controleExpressao = 0;
+                    }
+                    break;
+                }
+                i++;
+            }//Fim ignorando os parâmentros de funções
         }
 
-        if (value.tipo == "NUMERICO" || value.detalhe == "VARIÁVEL GLOBAL" || value.detalhe == "VARIÁVEL LOCAL") {
+        if (controleExpressao && (value.tipo == "NUMERICO" || value.detalhe == "VARIÁVEL GLOBAL" || value.detalhe == "VARIÁVEL LOCAL")) {
+            //Inicio Verificando se for um número negativo
             if(value.valor < 0) {
                 if(expressao.length !== 0) {
                     var aux = expressao.pop();
@@ -219,6 +229,7 @@ function analizadorSintatico() {
                     }
                 }
             }
+            //Fim Verificando se for um número negativo
 
             //Inicio Valida numérico
             var aux1 = expressao.pop();
@@ -245,13 +256,13 @@ function analizadorSintatico() {
             }
             //FIM Valida numérico
         }
-        else if (value.detalhe == "ABERTURA DE PARENTESE") {
+        else if (controleExpressao && (value.detalhe == "ABERTURA DE PARENTESE")) {
             expressao.push("(");
         }
-        else if (value.detalhe == "OPERADOR DE ADIÇÃO" || value.detalhe == "OPERADOR DE SUBTRAÇÃO" || value.detalhe == "OPERADOR DE MULTIPLICAÇÃO" || value.detalhe == "OPERADOR DE DIVISÃO" ) {
+        else if (controleExpressao && (value.detalhe == "OPERADOR DE ADIÇÃO" || value.detalhe == "OPERADOR DE SUBTRAÇÃO" || value.detalhe == "OPERADOR DE MULTIPLICAÇÃO" || value.detalhe == "OPERADOR DE DIVISÃO")) {
             expressao.push("OP");
         }
-        else if (value.detalhe == "FECHAMENTO DE PARENTESE") {
+        else if (controleExpressao && (value.detalhe == "FECHAMENTO DE PARENTESE")) {
             var aux1 = expressao.pop();
             var aux2 = expressao.pop();
 
@@ -303,9 +314,14 @@ function analizadorSintatico() {
                 expressao.push("ERRO");
         }
 
+        if (value.detalhe == "FECHAMENTO DE PARENTESE") {
+            parenteses.pop();
+            parentesesFechando.push(value);
+            controleExpressao = 1;
+        }
+
         //INICIO verifica ponto e vírgula
         pontoVìrgula.push(value);
-
         if(value.valor == "\n") {
             var a = pontoVìrgula.pop();
             var b = pontoVìrgula.pop();
@@ -318,6 +334,11 @@ function analizadorSintatico() {
             pontoVìrgula.push(a);
         }
         //FIM verifica ponto e virgula
+
+        if(expressao.length != 0) {
+            console.log("-----------------");
+            console.log(expressao);
+        }
 
         if(expressao.length === 1) {
             var aux = expressao.pop();
@@ -344,10 +365,8 @@ function analizadorSintatico() {
             if(expressao.length > 1) {
                 erroSintatico("Existe alguma expressão inválida", linha);
             }
-            if(expressao.length != 0) {
-                console.log("-----------------");
-                console.log(expressao);
-            }
+            console.log("\n\n\n");
+
             expressao = [];
         }
 
