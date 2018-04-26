@@ -4,7 +4,7 @@ $(document).ready(function(){
         "debug": false,
         "newestOnTop": false,
         "progressBar": true,
-        "positionClass": "toast-bottom-center",
+        "positionClass": "toast-bottom-right",
         "preventDuplicates": false,
         "onclick": null,
         "showDuration": "300",
@@ -194,6 +194,8 @@ function analizadorSintatico() {
     var pontoVìrgula = [];
 
     console.clear();
+
+    var linha = 1;
     $.each(tokensGlobais, function( key, value ) {
         if (value.detalhe == "ABERTURA DE PARENTESE") {
             parenteses.push(value);
@@ -204,7 +206,7 @@ function analizadorSintatico() {
             parentesesFechando.push(value);
         }
 
-        if (value.tipo == "NUMERICO") {
+        if (value.tipo == "NUMERICO" || value.detalhe == "VARIÁVEL GLOBAL" || value.detalhe == "VARIÁVEL LOCAL") {
             if(value.valor < 0) {
                 if(expressao.length !== 0) {
                     var aux = expressao.pop();
@@ -296,9 +298,8 @@ function analizadorSintatico() {
                 expressao.push(")");
             }
         }
-
         else {
-            if (expressao.length > 0 && value.detalhe !== "FINALIZADOR DE COMANDO" && value.tipo !== "ESPAÇO" && value.tipo !== "QUEBRA DE LINHA")
+            if (expressao.length > 0 && value.detalhe !== "FINALIZADOR DE COMANDO" && value.tipo !== "ESPAÇO" && value.tipo !== "QUEBRA DE LINHA" && value.detalhe !== "OPERADOR DE ATRIBUIÇÃO")
                 expressao.push("ERRO");
         }
 
@@ -308,9 +309,9 @@ function analizadorSintatico() {
         if(value.valor == "\n") {
             var a = pontoVìrgula.pop();
             var b = pontoVìrgula.pop();
-            if (b.valor != "}" && b.valor != "<?php" && b.valor != "?>" && b.valor != "\n" && b.tipo != "COMENTÁRIO") {
+            if (b.valor != "{" && b.valor != "}" && b.valor != "<?php" && b.valor != "?>" && b.valor != "\n" && b.tipo != "COMENTÁRIO") {
                 if (b.valor != ";") {
-                    erroSintatico("Falta ponto e vírgula");
+                    erroSintatico("Falta ponto e vírgula", linha);
                 }
             }
             pontoVìrgula.push(b);
@@ -324,11 +325,11 @@ function analizadorSintatico() {
                 if(aux !== "(") {
                     expressao = [];
                     if (aux === "OP")
-                        erroSintatico("Existe um operador sobrando na expressão!");
+                        erroSintatico("Existe um operador sobrando na expressão!", linha);
                     else if (aux === ")")
-                        erroSintatico("Existe um fechamento de parêntese sobrando na expressão!");
+                        erroSintatico("Existe um fechamento de parêntese sobrando na expressão!", linha);
                     else
-                        erroSintatico("Existe alguma expressão inválida");
+                        erroSintatico("Existe alguma expressão inválida", linha);
                 }
                 else {
                     expressao.push("(");
@@ -339,9 +340,9 @@ function analizadorSintatico() {
             }
         }
 
-        if (value.tipo === "QUEBRA DE LINHA" || value.detalhe === "FINALIZADOR DE COMANDO") {
+        if (value.tipo === "QUEBRA DE LINHA" || value.detalhe === "FINALIZADOR DE COMANDO" || value.detalhe === "OPERADOR DE ATRIBUIÇÃO") {
             if(expressao.length > 1) {
-                erroSintatico("Existe alguma expressão inválida");
+                erroSintatico("Existe alguma expressão inválida", linha);
             }
             if(expressao.length != 0) {
                 console.log("-----------------");
@@ -349,10 +350,14 @@ function analizadorSintatico() {
             }
             expressao = [];
         }
+
+        if (value.tipo === "QUEBRA DE LINHA") {
+            linha++;
+        }
     });
 
     if((parenteses.length != 0) || (parentesesAbrindo.length != parentesesFechando.length))
-        erroSintatico("Existe algum problema nas estruturas de parênteses. :´(");
+        erroSintatico("Existe algum problema nas estruturas de parênteses. :´(", '');
 }
 
 function analizadorSemantico() {
@@ -729,6 +734,6 @@ function autoIdentar() {
     $("#codigo").val(codigoIdentado);
 }
 
-function erroSintatico(texto) {
-    toastr.warning(""+texto, "Erro sintático.");
+function erroSintatico(texto, linha) {
+    toastr.warning(texto+(linha != '' ? "\nLinha: "+linha : ""), "Erro sintático.");
 }
