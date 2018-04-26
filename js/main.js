@@ -40,4 +40,21 @@ $(document).ready(function(){
             $('.numbers').css("height", (tam+4)+"px");
        }
    }));
+
+    var map = {17: false, 32: false};
+    $("#codigo").on("keydown", (function(e) {
+        if (e.keyCode in map) {
+            map[e.keyCode] = true;
+            if (map[17] && map[32]) {
+               $('.janela').css("display", "block");
+            }
+        }
+    })).on("keyup", (function(e) {
+        if (e.keyCode in map) {
+            map[e.keyCode] = false;
+        }
+    }));
+
+    
+
 });

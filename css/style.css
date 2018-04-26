@@ -55,8 +55,8 @@ input {
 
 .numbers{
     float: left;
-    min-height: 300px;
-    height: 300px;
+    min-height: 395px;
+    height: 395px;
     overflow: hidden;
 }
 
@@ -113,6 +113,38 @@ textarea:focus, input:focus, select:focus {
     float: right;
     margin-right: 15px;
     margin-top: 5px;
+}
+
+.janela{
+    position: absolute;
+    width: 200px;
+    height: 150px;
+    overflow-y: auto;
+    border: 1px solid #000000;
+    background-color: #2a2a2a;
+    color: #007ACD;
+    display: none;
+    top: 210px;
+    left: 760px;
+    z-index:99999;
+}
+
+.janela > p{
+    padding: 5px;
+    border-top: 1px solid #1a1a1a;
+    margin-bottom: 0;
+}
+
+.janela > p:hover{
+    background-color: #3a3a3a;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track-piece {
+    background-color: #999;
 }
 
 @media all and (max-width: 1200px){
