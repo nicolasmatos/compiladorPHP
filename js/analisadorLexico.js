@@ -191,6 +191,7 @@ function analizadorSintatico() {
     var parentesesAbrindo = [];
     var parentesesFechando = [];
     var expressao = [];
+    var pontoVìrgula = [];
 
     console.clear();
     $.each(tokensGlobais, function( key, value ) {
@@ -300,6 +301,22 @@ function analizadorSintatico() {
             if (expressao.length > 0 && value.detalhe !== "FINALIZADOR DE COMANDO" && value.tipo !== "ESPAÇO" && value.tipo !== "QUEBRA DE LINHA")
                 expressao.push("ERRO");
         }
+
+        //INICIO verifica ponto e vírgula
+        pontoVìrgula.push(value);
+
+        if(value.valor == "\n") {
+            var a = pontoVìrgula.pop();
+            var b = pontoVìrgula.pop();
+            if (b.valor != "}" && b.valor != "<?php" && b.valor != "?>" && b.valor != "\n" && b.tipo != "COMENTÁRIO") {
+                if (b.valor != ";") {
+                    erroSintatico("Falta ponto e vírgula");
+                }
+            }
+            pontoVìrgula.push(b);
+            pontoVìrgula.push(a);
+        }
+        //FIM verifica ponto e virgula
 
         if(expressao.length === 1) {
             var aux = expressao.pop();
