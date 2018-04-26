@@ -6,10 +6,37 @@ body{
     color: white;
 }
 
-input {
-    background-color: transparent;
-    border: 0;
+input#palavrasReservadas {
+    position: absolute;
+    border: 1px solid #000000;
+    background-color: #2a2a2a;
     color: #ffffff;
+    top: 210px;
+    left: 760px;
+    z-index:99999;
+    display: none;
+}
+
+ul#ui-id-1{
+    background-color: #2a2a2a;
+    border: 1px solid #2a2a2a;
+    height: 110px;
+    list-style: none;
+    padding-left: 0;
+    overflow-y: auto;
+    width: 176px!important;
+}
+
+li.ui-menu-item{
+    padding: 5px;
+    border-top: 1px solid #1a1a1a;
+    margin-bottom: 0;
+    color: #007ACD;
+}
+
+li.ui-menu-item:hover{
+    cursor: pointer;
+    background-color: #3a3a3a;
 }
 
 .container{

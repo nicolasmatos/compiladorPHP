@@ -21,13 +21,7 @@
         </div>
 
         <div class="row container" style="padding: 0; border: 1px solid #999999; min-height: 0; height: 100%; margin-left: 0; margin-bottom: 20px">
-            <div id="janela" class="janela">
-                <p>php</p>
-                <p>int</p>
-                <p>mel</p>
-                <p>oq</p>
-                <p>sda</p>
-            </div>
+            <div id="janela" class="janela"></div>
             <div class="numbers col-lg-1">
                 <p class="1">01</p>
                 <p class="2">02</p>
@@ -72,6 +66,9 @@
             </div>
 
             <div class="col-lg-11 col-xs-12" style="padding: 0; border-left: 1px solid #999999;">
+                <div class="ui-widget">
+                    <input id="palavrasReservadas" onblur="oculta();">
+                </div>
                 <textarea name="codigo" id="codigo" class="resizable_textarea" cols="30" rows="10"><?php
 function main(){
 	$a = 0;
@@ -161,6 +158,7 @@ function main(){
         </div>
     </div>
 </body>
+<script language="JavaScript" type="text/javascript" src="js/jquery-ui.min.js"></script>
 
 <script language="JavaScript" type="text/javascript" src="js/analisadorLexico.js"></script>
 

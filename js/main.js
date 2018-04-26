@@ -41,12 +41,19 @@ $(document).ready(function(){
        }
    }));
 
+    $(document).on("keydown", (function(e) {
+        if(e.which == 27){
+            $(".ui-autocomplete-input").css("display", "none");
+        }
+    }));
+
     var map = {17: false, 32: false};
     $("#codigo").on("keydown", (function(e) {
         if (e.keyCode in map) {
             map[e.keyCode] = true;
             if (map[17] && map[32]) {
-               $('.janela').css("display", "block");
+               $('.ui-autocomplete-input').css("display", "block");
+               $('.ui-autocomplete-input').focus();
             }
         }
     })).on("keyup", (function(e) {
@@ -54,7 +61,8 @@ $(document).ready(function(){
             map[e.keyCode] = false;
         }
     }));
-
-    
-
 });
+
+function oculta() {
+    $('.ui-autocomplete-input').css("display", "none");
+}
