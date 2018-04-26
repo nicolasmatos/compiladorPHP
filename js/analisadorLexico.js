@@ -192,6 +192,7 @@ function analizadorSintatico() {
     var parentesesFechando = [];
     var expressao = [];
     var pontoVìrgula = [];
+    var varsDeclaradas = [];
 
     console.clear();
 
@@ -334,6 +335,27 @@ function analizadorSintatico() {
             pontoVìrgula.push(a);
         }
         //FIM verifica ponto e virgula
+
+        //Verificações de erros
+        if(value.detalhe == "VARIÁVEL GLOBAL" || value.detalhe == "VARIÁVEL LOCAL") {
+            var i = 1;
+            while((key + i) < tokensGlobais.length-1) {
+                if ((tokensGlobais[key + i].tipo !== "ESPAÇO") && (tokensGlobais[key + i].valor !== "\t")) {
+                    if (tokensGlobais[key + i].detalhe === "OPERADOR DE ATRIBUIÇÃO") {
+                        var valor = value.valor.split('.');
+                        if(varsDeclaradas.indexOf(valor[0]) === -1)
+                            varsDeclaradas.push(valor[0]);
+                    }
+                    else {
+                        var valor = value.valor.split('.');
+                        if(varsDeclaradas.indexOf(valor[0]) === -1)
+                            erroSintatico("Variável não foi declarada. :´(", linha);
+                    }
+                    break;
+                }
+                i++;
+            }
+        }
 
         if(expressao.length != 0) {
             console.log("-----------------");
