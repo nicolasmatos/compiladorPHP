@@ -1,0 +1,35 @@
+#Correto
+function main(){
+	$x = 0;
+	$y = 0;
+	$z = 2;
+	read(x);
+	$y = mult($x,sum($z,5));
+}
+
+function sum($a, $b){
+	$x = $a + $b;
+	return $x;
+}
+
+function mult($x,$y){
+	$z = $x * $y;
+}
+
+#Errado
+function maining( {
+	$1x = 0;
+	$y = 0;
+	$z = 'a';
+	read($x);
+	$y = mult(x,div(,5));
+}
+
+function sum[$a,$b]{
+	$x = $a+ ;
+	return $y;
+}
+
+function mult($x,$y){
+	$z = $x * $y;
+}

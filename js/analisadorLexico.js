@@ -96,7 +96,7 @@ function analisar() {
                     "<td>"+ (coluna++) +"</td>" +
                     "<td>-</td>" +
                     "<td>" + value.escopo + "</td>" +
-                    "<td><input type='text' readonly value='" + value.valor + "'</td>" +
+                    "<td><input type='text' class='inputTable' readonly value='" + value.valor + "'</td>" +
                     "<td>" + value.tipo + "</td>" +
                     "<td>" + value.detalhe + "</td>" +
                     "<td>" + value.valido + "</td>" +
