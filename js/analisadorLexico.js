@@ -230,6 +230,37 @@ function analizadorSintatico() {
 
     });
 
+    var funcParametros = [];
+    $.each(tokensGlobaisRedu, function( key, value ) {
+        if(value.detalhe === "FUNÇÃO" && value.valor !== "read") {
+            if (tokensGlobaisRedu[key - 1].valor === "function") {
+                var parametros = [];
+                var i = 2;
+                while((key + i) < tokensGlobaisRedu.length-1) {
+                    if (tokensGlobaisRedu[key + i].detalhe !== "FECHAMENTO DE PARENTESE") {
+                        if (tokensGlobaisRedu[key + i].valor !== ",") {
+                            parametros.push(tokensGlobaisRedu[key + i]);
+
+                            if(tokensGlobaisRedu[key + i].detalhe == "VARIÁVEL GLOBAL" || tokensGlobaisRedu[key + i].detalhe == "VARIÁVEL LOCAL") {
+                                var valor = tokensGlobaisRedu[key + i].valor.split('.');
+                                if(varsDeclaradas.indexOf(valor[0]) === -1)
+                                    varsDeclaradas.push(valor[0]);
+                            }
+                        }
+                    }
+                    else {
+                        break;
+                    }
+                    i++;
+                }
+                funcParametros[value.valor] = parametros;
+                parametros = [];
+            }
+        }
+    });
+
+    console.log(funcParametros);
+
     $.each(tokensGlobaisRedu, function( key, value ) {
         if (value.detalhe == "ABERTURA DE PARENTESE") {
             parenteses.push(value);
@@ -239,6 +270,28 @@ function analizadorSintatico() {
             var i = 1;
             if (tokensGlobaisRedu[key - i].detalhe === "FUNÇÃO" || tokensGlobaisRedu[key - i].detalhe === "PALAVRA RESERVADA") {
                 controleExpressao = 0;
+            }
+        }
+
+        //Se estiver declarando uma função inicializa as variaveis dos parametrso como declaradas
+        if(value.detalhe === "FUNÇÃO" && value.valor !== "read") {
+            if (tokensGlobaisRedu[key - 1].valor === "function") {
+                var i = 2;
+                while((key + i) < tokensGlobaisRedu.length-1) {
+                    if (tokensGlobaisRedu[key + i].detalhe !== "FECHAMENTO DE PARENTESE") {
+                        if (tokensGlobaisRedu[key + i].valor !== ",") {
+                            if(tokensGlobaisRedu[key + i].detalhe == "VARIÁVEL GLOBAL" || tokensGlobaisRedu[key + i].detalhe == "VARIÁVEL LOCAL") {
+                                var valor = tokensGlobaisRedu[key + i].valor.split('.');
+                                if(varsDeclaradas.indexOf(valor[0]) === -1)
+                                    varsDeclaradas.push(valor[0]);
+                            }
+                        }
+                    }
+                    else {
+                        break;
+                    }
+                    i++;
+                }
             }
         }
 
@@ -426,6 +479,10 @@ function analizadorSintatico() {
 
         if (value.tipo === "QUEBRA DE LINHA") {
             linha++;
+        }
+
+        if (value.detalhe == "FECHAMENTO DE CHAVE") {
+            varsDeclaradas = [];
         }
     });
 

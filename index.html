@@ -70,17 +70,22 @@
                     <input id="palavrasReservadas" onblur="oculta();">
                 </div>
                 <textarea name="codigo" id="codigo" class="resizable_textarea" cols="30" rows="10"><?php
-function sum(){
-}
-
-function mult(){
-}
 function main(){
 	$x = 0;
 	$y = 0;
 	$z = 2;
 	read($x);
 	$y = mult($x,sum($z,5));
+}
+
+function sum($a, $b){
+	$x = $a + $b;
+	return $x;
+}
+
+function mult($x,$y){
+	$z = $x * $y;
+	return $z;
 }
 ?>
 
