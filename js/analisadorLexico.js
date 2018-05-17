@@ -50,8 +50,6 @@ function Token(tipo, valor, valido, detalhe, escopo) {
     this.escopo = escopo;
 }
 
-
-
 var palavrasReservadas = ['<?php', '?>', '__halt_compiler', 'abstract', 'and', 'array', 'as', 'break', 'callable', 'case', 'catch', 'class', 'clone', 'const', 'continue', 'declare', 'default', 'die', 'do', 'echo', 'else', 'elseif', 'empty', 'enddeclare', 'endfor', 'endforeach', 'endif', 'endswitch', 'endwhile', 'eval', 'exit', 'extends', 'final', 'for', 'foreach', 'function', 'global', 'goto', 'if', 'implements', 'include', 'include_once', 'instanceof', 'insteadof', 'interface', 'isset', 'list', 'namespace', 'new', 'or', 'print', 'private', 'protected', 'public', 'require', 'require_once', 'return', 'static', 'switch', 'throw', 'trait', 'try', 'unset', 'use', 'var', 'while', 'xor'];
 
 var tokensGlobais = [];
@@ -174,10 +172,8 @@ function analizadorLexico() {
         }
 
         if (token.tipo == "IDENTIFICADOR") {
-            if (palavrasReservadas.indexOf(token.valor) <= -1) {
-            } else {
-                token.detalhe = "PALAVRA RESERVADA";
-                var x = token.valor;
+            if (palavrasReservadas.indexOf(token.valor) > -1) {
+                token.detalhe = "PALAVRA RESERVADA"
             }
             if (token.detalhe != "FUNÇÃO" && token.detalhe != "VARIÁVEL GLOBAL" && token.detalhe != "VARIÁVEL LOCAL" && token.detalhe != "PALAVRA RESERVADA") {
                 token.detalhe = "";
