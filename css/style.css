@@ -74,8 +74,8 @@ input {
 .equipe {
     color: white;
 }
-
-textarea#codigo{
+/*textarea*/
+#codigo{
     width: 100%;
     min-height: 300px;
     overflow: hidden;
@@ -87,7 +87,8 @@ textarea#codigo{
     color: #ffffff;
 }
 
-textarea#codigo:focus{
+/*textarea*/
+#codigo:focus{
     width: 100%;
     min-height: 300px;
     overflow: hidden;
@@ -100,6 +101,7 @@ textarea#codigo:focus{
     color: #ffffff;
 }
 
+/**/
 textarea:focus, input:focus, select:focus {
     box-shadow: 0 0 0 0;
     border: 0 none;
@@ -138,6 +140,24 @@ textarea:focus, input:focus, select:focus {
 .janela > p:hover{
     background-color: #3a3a3a;
 }
+
+
+
+#editor {
+    border:1px solid orange;
+    background-color: white;
+}
+
+.tipo {
+    color:red;
+    font-weight: bold;
+}
+
+.base {
+    color:purple;
+    font-weight: bold;
+}
+
 
 ::-webkit-scrollbar {
     width: 8px;
