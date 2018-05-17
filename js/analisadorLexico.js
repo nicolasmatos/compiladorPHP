@@ -201,27 +201,45 @@ function analizadorSintatico() {
     var expressao = [];
     var pontoVìrgula = [];
     var varsDeclaradas = [];
+    var funcsDeclaradas = [];
 
     console.clear();
 
     var linha = 1;
     var controleExpressao = 1;
+
+    var tokensGlobaisRedu = [];
     $.each(tokensGlobais, function( key, value ) {
+        if ((value.tipo !== "ESPAÇO") && (value.valor !== "\t")) {
+            tokensGlobaisRedu.push(value);
+
+            if(value.detalhe === "FUNÇÃO" && value.valor !== "read") {
+                var i = 1;
+                while((key - i) < tokensGlobais.length-1) {
+                    if ((tokensGlobais[key - i].tipo !== "ESPAÇO") && (tokensGlobais[key - i].valor !== "\t")) {
+                        if (tokensGlobais[key - i].valor === "function") {
+                            if(funcsDeclaradas.indexOf(value.valor) === -1)
+                                funcsDeclaradas.push(value.valor);
+                        }
+                        break;
+                    }
+                    i++;
+                }
+            }
+        }
+
+    });
+
+    $.each(tokensGlobaisRedu, function( key, value ) {
         if (value.detalhe == "ABERTURA DE PARENTESE") {
             parenteses.push(value);
             parentesesAbrindo.push(value);
 
             //Inicio ignorando os parâmentros de funções
             var i = 1;
-            while((key - i) >= 0) {
-                if ((tokensGlobais[key - i].tipo !== "ESPAÇO") && (tokensGlobais[key - i].valor !== "\t")) {
-                    if (tokensGlobais[key - i].detalhe === "FUNÇÃO" || tokensGlobais[key - i].detalhe === "PALAVRA RESERVADA") {
-                        controleExpressao = 0;
-                    }
-                    break;
-                }
-                i++;
-            }//Fim ignorando os parâmentros de funções
+            if (tokensGlobaisRedu[key - i].detalhe === "FUNÇÃO" || tokensGlobaisRedu[key - i].detalhe === "PALAVRA RESERVADA") {
+                controleExpressao = 0;
+            }
         }
 
         if (controleExpressao && (value.tipo == "NUMERICO" || value.detalhe == "VARIÁVEL GLOBAL" || value.detalhe == "VARIÁVEL LOCAL")) {
@@ -347,21 +365,27 @@ function analizadorSintatico() {
         //Verificações de erros
         if(value.detalhe == "VARIÁVEL GLOBAL" || value.detalhe == "VARIÁVEL LOCAL") {
             var i = 1;
-            while((key + i) < tokensGlobais.length-1) {
-                if ((tokensGlobais[key + i].tipo !== "ESPAÇO") && (tokensGlobais[key + i].valor !== "\t")) {
-                    if (tokensGlobais[key + i].detalhe === "OPERADOR DE ATRIBUIÇÃO") {
-                        var valor = value.valor.split('.');
-                        if(varsDeclaradas.indexOf(valor[0]) === -1)
-                            varsDeclaradas.push(valor[0]);
-                    }
-                    else {
-                        var valor = value.valor.split('.');
-                        if(varsDeclaradas.indexOf(valor[0]) === -1)
-                            erroSintatico("Variável não foi declarada. :´(", linha);
-                    }
-                    break;
-                }
-                i++;
+            if (tokensGlobaisRedu[key + i].detalhe === "OPERADOR DE ATRIBUIÇÃO") {
+                var valor = value.valor.split('.');
+                if(varsDeclaradas.indexOf(valor[0]) === -1)
+                    varsDeclaradas.push(valor[0]);
+            }
+            else {
+                var valor = value.valor.split('.');
+                if(varsDeclaradas.indexOf(valor[0]) === -1)
+                    erroSintatico("Variável não foi declarada. :´(", linha);
+            }
+        }
+
+        if(value.detalhe === "FUNÇÃO" && value.valor !== "read") {
+            var i = 1;
+            if (tokensGlobaisRedu[key - i].valor === "function") {
+                if(funcsDeclaradas.indexOf(value.valor) === -1)
+                    funcsDeclaradas.push(value.valor);
+            }
+            else {
+                if(funcsDeclaradas.indexOf(value.valor) === -1)
+                    erroSintatico("Função não foi declarada. :´(", linha);
             }
         }
 
