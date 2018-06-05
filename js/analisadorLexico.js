@@ -548,7 +548,74 @@ function analizadorSintatico() {
 }
 
 function analizadorSemantico() {
+    var tokensGlobaisRedu = [];
+    $.each(tokensGlobais, function( key, value ) {
+        if ((value.tipo !== "ESPAÇO") && (value.valor !== "\t")) {
+            tokensGlobaisRedu.push(value);
+        }
+    });
+    var vars = [];
+    var expressao = [];
+    $.each(tokensGlobaisRedu, function( key, value ) {
+        if(value.detalhe == "VARIÁVEL GLOBAL" || value.detalhe == "VARIÁVEL LOCAL") {
+            if (tokensGlobaisRedu[key + 1].detalhe === "OPERADOR DE ATRIBUIÇÃO") {
+                var valor = value.valor.split('.');
+                var valorVar;
+                if (tokensGlobaisRedu[key + 3].tipo === "QUEBRA DE LINHA" || tokensGlobaisRedu[key + 3].detalhe === "FINALIZADOR DE COMANDO" ) {
+                    if (tokensGlobaisRedu[key + 2].detalhe == "VARIÁVEL GLOBAL" || tokensGlobaisRedu[key + 2].detalhe == "VARIÁVEL LOCAL") {
+                        $.each(vars, function( keyVar, valueVar ) {
+                            var v = tokensGlobaisRedu[key + 2].valor.split('.');
+                            if (vars[keyVar][0] == v[0]) {
+                                valorVar = vars[keyVar][1];
+                            }
+                        });
+                    }
+                    else {
+                        valorVar = tokensGlobaisRedu[key + 2].valor;
+                    }
 
+                    if(vars.indexOf(valor[0]) === -1)
+                        vars.push([valor[0], valorVar]);
+                    else{
+                        $.each(vars, function( keyVar, valueVar ) {
+                            if (vars[keyVar][0] == valor[0]) {
+                                vars[keyVar][1]  = valorVar;
+                            }
+                        });
+                    }
+                }
+                else {
+                    var i = key+2;
+                    var stringE = "";
+                    while (i < tokensGlobaisRedu.length && (tokensGlobaisRedu[i].tipo !== "QUEBRA DE LINHA" || tokensGlobaisRedu[i].detalhe === "FINALIZADOR DE COMANDO")) {
+                        if (tokensGlobaisRedu[i].detalhe == "VARIÁVEL GLOBAL" || tokensGlobaisRedu[i].detalhe == "VARIÁVEL LOCAL") {
+                            $.each(vars, function( keyVar, valueVar ) {
+                                var v = tokensGlobaisRedu[i].valor.split('.');
+                                if (vars[keyVar][0] == v[0]) {
+                                    stringE = stringE + vars[keyVar][1];
+                                }
+                            });
+                        }
+                        else {
+                            if(tokensGlobaisRedu[i].detalhe !== "FINALIZADOR DE COMANDO")
+                                stringE = stringE + tokensGlobaisRedu[i].valor;
+                        }
+                        i++;
+                    }
+                    if(vars.indexOf(valor[0]) === -1)
+                        vars.push([valor[0], eval(stringE)]);
+                    else{
+                        $.each(vars, function( keyVar, valueVar ) {
+                            if (vars[keyVar][0] == valor[0]) {
+                                vars[keyVar][1]  = eval(stringE);
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    });
+    console.log(vars);
 }
 
 function validarTokenNumerico(caracteres) {
