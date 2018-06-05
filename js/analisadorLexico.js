@@ -220,6 +220,8 @@ function analizadorSintatico() {
                         if (tokensGlobais[key - i].valor === "function") {
                             if(funcsDeclaradas.indexOf(value.valor) === -1)
                                 funcsDeclaradas.push(value.valor);
+                            else
+                                erroSintatico("Função " + value.valor + " já declarada, não é possivel sobrescrtia de funções", '');
                         }
                         break;
                     }
@@ -259,9 +261,22 @@ function analizadorSintatico() {
         }
     });
 
-    console.log(funcParametros);
-
+    var ctrlFuncao = 0;
+    var param = [];
+    var inicioFuncao = false;
+    var funcAtual = '';
+    var funcCtrl = '';
     $.each(tokensGlobaisRedu, function( key, value ) {
+        if (value.detalhe === "FUNÇÃO" && value.valor !== 'read' && tokensGlobaisRedu[key - 1].valor !== 'function') {
+            if (!inicioFuncao) {
+                funcAtual = value;
+            }
+            inicioFuncao = true;
+
+            if (ctrlFuncao == 1 && inicioFuncao)
+                funcCtrl = value;
+        }
+
         if (value.detalhe == "ABERTURA DE PARENTESE") {
             parenteses.push(value);
             parentesesAbrindo.push(value);
@@ -271,6 +286,8 @@ function analizadorSintatico() {
             if (tokensGlobaisRedu[key - i].detalhe === "FUNÇÃO" || tokensGlobaisRedu[key - i].detalhe === "PALAVRA RESERVADA") {
                 controleExpressao = 0;
             }
+            if(inicioFuncao)
+                ctrlFuncao++;
         }
 
         //Se estiver declarando uma função inicializa as variaveis dos parametrso como declaradas
@@ -484,7 +501,47 @@ function analizadorSintatico() {
         if (value.detalhe == "FECHAMENTO DE CHAVE") {
             varsDeclaradas = [];
         }
+
+        if(value.valor === "," || value.detalhe === "FECHAMENTO DE PARENTESE") {
+            if(value.valor === ",") {
+                if (ctrlFuncao == 1) {
+                    if(funcCtrl != "")
+                        param.push(funcCtrl);
+                    else
+                    param.push(tokensGlobaisRedu[key - 1]);
+                }
+            }
+            if(value.detalhe === "FECHAMENTO DE PARENTESE") {
+                if (inicioFuncao && ctrlFuncao == 1) {
+                    param.push(funcCtrl);
+                    funcCtrl = '';
+                }
+                if(inicioFuncao)
+                    ctrlFuncao--;
+            }
+        }
+
+        if(value.valor === ";") {
+            if (inicioFuncao) {
+                console.log(funcParametros);
+                console.log("Param: ");
+                console.log(funcAtual);
+                console.log(param);
+                var a = funcParametros[funcAtual.valor];
+                if (a != undefined) {
+                    if (!(a.length == param.length))
+                        erroSintatico("Incopatibilidade dos parâmetros da função: " + funcAtual.valor, linha);
+                }
+                ctrlFuncao = 0;
+                param = [];
+                inicioFuncao = false;
+                funcAtual = '';
+                funcCtrl = '';
+            }
+        }
     });
+
+
 
     if((parenteses.length != 0) || (parentesesAbrindo.length != parentesesFechando.length))
         erroSintatico("Existe algum problema nas estruturas de parênteses. :´(", '');
